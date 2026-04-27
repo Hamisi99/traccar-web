@@ -18,7 +18,7 @@ import Battery60Icon from '@mui/icons-material/Battery60';
 import BatteryCharging60Icon from '@mui/icons-material/BatteryCharging60';
 import Battery20Icon from '@mui/icons-material/Battery20';
 import BatteryCharging20Icon from '@mui/icons-material/BatteryCharging20';
-import ErrorIcon from '@mui/icons-material/Error';
+import { AlertTriangle } from 'lucide-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { devicesActions } from '../store';
@@ -194,7 +194,7 @@ const DeviceRow = ({ devices, index, style }) => {
             {position.attributes.hasOwnProperty('alarm') && (
               <Tooltip title={`${t('eventAlarm')}: ${formatAlarm(position.attributes.alarm, t)}`}>
                 <IconButton size="small">
-                  <ErrorIcon fontSize="small" className={classes.error} />
+                  <AlertTriangle size={18} strokeWidth={1.75} className={classes.error} />
                 </IconButton>
               </Tooltip>
             )}

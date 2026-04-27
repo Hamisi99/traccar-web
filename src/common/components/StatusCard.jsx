@@ -22,12 +22,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
-import CloseIcon from '@mui/icons-material/Close';
-import RouteIcon from '@mui/icons-material/Route';
-import SendIcon from '@mui/icons-material/Send';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PendingIcon from '@mui/icons-material/Pending';
+import { X, Route, Send, SquarePen, Trash2, Ellipsis } from 'lucide-react';
 
 import { useTranslation } from './LocalizationProvider';
 import RemoveDialog from './RemoveDialog';
@@ -38,6 +33,9 @@ import { devicesActions } from '../../store';
 import { useCatch, useCatchCallback } from '../../reactHelper';
 import { useAttributePreference } from '../util/preferences';
 import fetchOrThrow from '../util/fetchOrThrow';
+
+const ICON_SIZE = 20;
+const ICON_STROKE = 1.75;
 
 const useStyles = makeStyles()((theme, { desktopPadding }) => ({
   card: {
@@ -87,8 +85,7 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
     justifyContent: 'space-between',
     ...(theme.palette.mode === 'dark' && {
       borderTop: '1px solid rgba(59, 130, 246, 0.1)',
-      background:
-        'linear-gradient(0deg, rgba(4, 10, 23, 0.3) 0%, transparent 100%)',
+      background: 'linear-gradient(0deg, rgba(4, 10, 23, 0.3) 0%, transparent 100%)',
     }),
   },
   root: {
@@ -152,7 +149,6 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
   const navigationAppTitle = useAttributePreference('navigationAppTitle');
 
   const [anchorEl, setAnchorEl] = useState(null);
-
   const [removing, setRemoving] = useState(false);
 
   const handleRemove = useCatch(async (removed) => {
@@ -199,7 +195,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                   image={`/api/media/${device.uniqueId}/${deviceImage}`}
                 >
                   <IconButton size="small" onClick={onClose} onTouchStart={onClose}>
-                    <CloseIcon fontSize="small" className={classes.mediaButton} />
+                    <X size={16} strokeWidth={ICON_STROKE} className={classes.mediaButton} />
                   </IconButton>
                 </CardMedia>
               ) : (
@@ -224,7 +220,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                     {device.name}
                   </Typography>
                   <IconButton size="small" onClick={onClose} onTouchStart={onClose}>
-                    <CloseIcon fontSize="small" />
+                    <X size={16} strokeWidth={ICON_STROKE} />
                   </IconButton>
                 </Box>
               )}
@@ -273,7 +269,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                     onClick={(e) => setAnchorEl(e.currentTarget)}
                     disabled={!position}
                   >
-                    <PendingIcon />
+                    <Ellipsis size={ICON_SIZE} strokeWidth={ICON_STROKE} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('reportReplay')}>
@@ -281,7 +277,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                     onClick={() => navigate(`/replay?deviceId=${deviceId}`)}
                     disabled={disableActions || !position}
                   >
-                    <RouteIcon />
+                    <Route size={ICON_SIZE} strokeWidth={ICON_STROKE} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('commandTitle')}>
@@ -289,7 +285,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                     onClick={() => navigate(`/settings/device/${deviceId}/command`)}
                     disabled={disableActions}
                   >
-                    <SendIcon />
+                    <Send size={ICON_SIZE} strokeWidth={ICON_STROKE} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('sharedEdit')}>
@@ -297,7 +293,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                     onClick={() => navigate(`/settings/device/${deviceId}`)}
                     disabled={disableActions || deviceReadonly}
                   >
-                    <EditIcon />
+                    <SquarePen size={ICON_SIZE} strokeWidth={ICON_STROKE} />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('sharedRemove')}>
@@ -306,7 +302,7 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                     onClick={() => setRemoving(true)}
                     disabled={disableActions || deviceReadonly}
                   >
-                    <DeleteIcon />
+                    <Trash2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />
                   </IconButton>
                 </Tooltip>
               </CardActions>

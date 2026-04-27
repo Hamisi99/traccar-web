@@ -11,11 +11,13 @@ import {
   Box,
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
-import DeleteIcon from '@mui/icons-material/Delete';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import { Trash2, BellRing } from 'lucide-react';
 import { formatNotificationTitle, formatTime } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { eventsActions } from '../store';
+
+const ICON_SIZE = 18;
+const ICON_STROKE = 1.75;
 
 const useStyles = makeStyles()((theme) => ({
   drawer: {
@@ -56,7 +58,7 @@ const EventsDrawer = ({ open, onClose }) => {
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Toolbar className={classes.toolbar} disableGutters>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
-          <NotificationsActiveIcon fontSize="small" color="primary" />
+          <BellRing size={18} strokeWidth={ICON_STROKE} color="#3b82f6" />
           <Typography variant="h6" className={classes.title}>
             {t('reportEvents')}
           </Typography>
@@ -66,7 +68,7 @@ const EventsDrawer = ({ open, onClose }) => {
           color="inherit"
           onClick={() => dispatch(eventsActions.deleteAll())}
         >
-          <DeleteIcon fontSize="small" />
+          <Trash2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />
         </IconButton>
       </Toolbar>
       <List className={classes.drawer} dense>
@@ -87,7 +89,7 @@ const EventsDrawer = ({ open, onClose }) => {
                 dispatch(eventsActions.delete(event));
               }}
             >
-              <DeleteIcon fontSize="small" />
+              <Trash2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />
             </IconButton>
           </ListItemButton>
         ))}

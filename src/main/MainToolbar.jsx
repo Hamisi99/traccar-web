@@ -21,13 +21,13 @@ import {
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
-import MapIcon from '@mui/icons-material/Map';
-import DnsIcon from '@mui/icons-material/Dns';
-import AddIcon from '@mui/icons-material/Add';
-import TuneIcon from '@mui/icons-material/Tune';
+import { Map, LayoutList, PlusCircle, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
 import DeviceRow from './DeviceRow';
+
+const ICON_SIZE = 20;
+const ICON_STROKE = 1.75;
 
 const useStyles = makeStyles()((theme) => ({
   toolbar: {
@@ -77,7 +77,11 @@ const MainToolbar = ({
   return (
     <Toolbar ref={toolbarRef} className={classes.toolbar}>
       <IconButton edge="start" onClick={() => setDevicesOpen(!devicesOpen)}>
-        {devicesOpen ? <MapIcon /> : <DnsIcon />}
+        {devicesOpen ? (
+          <Map size={ICON_SIZE} strokeWidth={ICON_STROKE} />
+        ) : (
+          <LayoutList size={ICON_SIZE} strokeWidth={ICON_STROKE} />
+        )}
       </IconButton>
       <OutlinedInput
         ref={inputRef}
@@ -94,7 +98,7 @@ const MainToolbar = ({
                 variant="dot"
                 invisible={!filter.statuses.length && !filter.groups.length}
               >
-                <TuneIcon fontSize="small" />
+                <SlidersHorizontal size={16} strokeWidth={ICON_STROKE} />
               </Badge>
             </IconButton>
           </InputAdornment>
@@ -198,7 +202,7 @@ const MainToolbar = ({
           title={t('deviceRegisterFirst')}
           arrow
         >
-          <AddIcon />
+          <PlusCircle size={ICON_SIZE} strokeWidth={ICON_STROKE} />
         </Tooltip>
       </IconButton>
     </Toolbar>

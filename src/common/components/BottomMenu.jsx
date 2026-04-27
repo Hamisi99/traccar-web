@@ -11,17 +11,15 @@ import {
   Badge,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-
-import DescriptionIcon from '@mui/icons-material/Description';
-import SettingsIcon from '@mui/icons-material/Settings';
-import MapIcon from '@mui/icons-material/Map';
-import PersonIcon from '@mui/icons-material/Person';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import { Map, BarChart3, Settings2, CircleUser, LogOut } from 'lucide-react';
 
 import { sessionActions } from '../../store';
 import { useTranslation } from './LocalizationProvider';
 import { useRestriction } from '../util/permissions';
 import { nativePostMessage } from './NativeInterface';
+
+const NAV_ICON_SIZE = 22;
+const NAV_STROKE = 1.75;
 
 const BottomMenu = () => {
   const navigate = useNavigate();
@@ -152,7 +150,7 @@ const BottomMenu = () => {
           label={t('mapTitle')}
           icon={
             <Badge color="error" variant="dot" overlap="circular" invisible={socket !== false}>
-              <MapIcon />
+              <Map size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />
             </Badge>
           }
           value="map"
@@ -160,23 +158,27 @@ const BottomMenu = () => {
         {!disableReports && (
           <BottomNavigationAction
             label={t('reportTitle')}
-            icon={<DescriptionIcon />}
+            icon={<BarChart3 size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
             value="reports"
           />
         )}
         <BottomNavigationAction
           label={t('settingsTitle')}
-          icon={<SettingsIcon />}
+          icon={<Settings2 size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
           value="settings"
         />
         {readonly ? (
           <BottomNavigationAction
             label={t('loginLogout')}
-            icon={<ExitToAppIcon />}
+            icon={<LogOut size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
             value="logout"
           />
         ) : (
-          <BottomNavigationAction label={t('settingsUser')} icon={<PersonIcon />} value="account" />
+          <BottomNavigationAction
+            label={t('settingsUser')}
+            icon={<CircleUser size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
+            value="account"
+          />
         )}
       </BottomNavigation>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
