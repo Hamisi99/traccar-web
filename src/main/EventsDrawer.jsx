@@ -8,9 +8,11 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  Box,
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import DeleteIcon from '@mui/icons-material/Delete';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { formatNotificationTitle, formatTime } from '../common/util/formatter';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { eventsActions } from '../store';
@@ -22,6 +24,11 @@ const useStyles = makeStyles()((theme) => ({
   toolbar: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
+    ...(theme.palette.mode === 'dark' && {
+      borderBottom: '1px solid rgba(59, 130, 246, 0.12)',
+      background:
+        'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(99, 102, 241, 0.06) 100%)',
+    }),
   },
   title: {
     flexGrow: 1,
@@ -35,7 +42,6 @@ const EventsDrawer = ({ open, onClose }) => {
   const t = useTranslation();
 
   const devices = useSelector((state) => state.devices.items);
-
   const events = useSelector((state) => state.events.items);
 
   const formatType = (event) =>
@@ -49,9 +55,12 @@ const EventsDrawer = ({ open, onClose }) => {
   return (
     <Drawer anchor="right" open={open} onClose={onClose}>
       <Toolbar className={classes.toolbar} disableGutters>
-        <Typography variant="h6" className={classes.title}>
-          {t('reportEvents')}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+          <NotificationsActiveIcon fontSize="small" color="primary" />
+          <Typography variant="h6" className={classes.title}>
+            {t('reportEvents')}
+          </Typography>
+        </Box>
         <IconButton
           size="small"
           color="inherit"
@@ -78,7 +87,7 @@ const EventsDrawer = ({ open, onClose }) => {
                 dispatch(eventsActions.delete(event));
               }}
             >
-              <DeleteIcon fontSize="small" className={classes.delete} />
+              <DeleteIcon fontSize="small" />
             </IconButton>
           </ListItemButton>
         ))}

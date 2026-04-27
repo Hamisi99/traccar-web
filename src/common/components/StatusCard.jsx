@@ -18,8 +18,10 @@ import {
   TableFooter,
   Link,
   Tooltip,
+  Box,
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
+import { useTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import RouteIcon from '@mui/icons-material/Route';
 import SendIcon from '@mui/icons-material/Send';
@@ -83,6 +85,11 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
   },
   actions: {
     justifyContent: 'space-between',
+    ...(theme.palette.mode === 'dark' && {
+      borderTop: '1px solid rgba(59, 130, 246, 0.1)',
+      background:
+        'linear-gradient(0deg, rgba(4, 10, 23, 0.3) 0%, transparent 100%)',
+    }),
   },
   root: {
     pointerEvents: 'none',
@@ -123,6 +130,8 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const t = useTranslation();
+  const theme = useTheme();
+  const dark = theme.palette.mode === 'dark';
 
   const readonly = useRestriction('readonly');
   const deviceReadonly = useDeviceReadonly();
@@ -194,14 +203,30 @@ const StatusCard = ({ deviceId, position, onClose, disableActions, desktopPaddin
                   </IconButton>
                 </CardMedia>
               ) : (
-                <div className={`${classes.header} draggable-header`}>
-                  <Typography variant="body2" color="textSecondary">
+                <Box
+                  className={`${classes.header} draggable-header`}
+                  sx={
+                    dark
+                      ? {
+                          background:
+                            'linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(99, 102, 241, 0.08) 100%)',
+                          borderBottom: '1px solid rgba(59, 130, 246, 0.12)',
+                          paddingBottom: '8px !important',
+                        }
+                      : {}
+                  }
+                >
+                  <Typography
+                    variant="body2"
+                    color={dark ? 'primary.light' : 'textSecondary'}
+                    sx={dark ? { fontWeight: 600, letterSpacing: '0.02em' } : {}}
+                  >
                     {device.name}
                   </Typography>
                   <IconButton size="small" onClick={onClose} onTouchStart={onClose}>
                     <CloseIcon fontSize="small" />
                   </IconButton>
-                </div>
+                </Box>
               )}
               {position && (
                 <CardContent className={classes.content}>

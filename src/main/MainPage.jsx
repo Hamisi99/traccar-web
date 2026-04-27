@@ -18,6 +18,14 @@ import { useAttributePreference } from '../common/util/preferences';
 const useStyles = makeStyles()((theme) => ({
   root: {
     height: '100%',
+    ...(theme.palette.mode === 'dark' && {
+      background: [
+        'radial-gradient(ellipse at 15% 50%, rgba(37, 99, 235, 0.07) 0%, transparent 55%)',
+        'radial-gradient(ellipse at 85% 15%, rgba(99, 102, 241, 0.06) 0%, transparent 55%)',
+        'radial-gradient(ellipse at 50% 90%, rgba(59, 130, 246, 0.04) 0%, transparent 50%)',
+        'linear-gradient(160deg, #040a17 0%, #060e1f 45%, #040a17 100%)',
+      ].join(', '),
+    }),
   },
   sidebar: {
     pointerEvents: 'none',
@@ -31,6 +39,21 @@ const useStyles = makeStyles()((theme) => ({
       width: theme.dimensions.drawerWidthDesktop,
       margin: theme.spacing(1.5),
       zIndex: 3,
+      ...(theme.palette.mode === 'dark' && {
+        background:
+          'linear-gradient(180deg, rgba(4, 10, 23, 0.95) 0%, rgba(8, 19, 38, 0.92) 100%)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderRadius: '20px',
+        border: '1px solid rgba(59, 130, 246, 0.15)',
+        boxShadow: [
+          '0 0 0 1px rgba(59, 130, 246, 0.05)',
+          '0 24px 64px rgba(0, 0, 0, 0.55)',
+          '0 0 80px rgba(37, 99, 235, 0.06)',
+          'inset 0 1px 0 rgba(147, 197, 253, 0.07)',
+        ].join(', '),
+        overflow: 'hidden',
+      }),
     },
     [theme.breakpoints.down('md')]: {
       height: '100%',
@@ -69,6 +92,7 @@ const MainPage = () => {
   const theme = useTheme();
 
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const dark = theme.palette.mode === 'dark';
 
   const mapOnSelect = useAttributePreference('mapOnSelect', true);
 
@@ -120,7 +144,23 @@ const MainPage = () => {
         />
       )}
       <div className={classes.sidebar}>
-        <Paper square elevation={3} className={classes.header}>
+        <Paper
+          square
+          elevation={3}
+          className={classes.header}
+          sx={
+            dark
+              ? {
+                  background: 'transparent',
+                  backdropFilter: 'none',
+                  WebkitBackdropFilter: 'none',
+                  boxShadow: 'none',
+                  borderRadius: 0,
+                  borderBottom: '1px solid rgba(59, 130, 246, 0.1)',
+                }
+              : {}
+          }
+        >
           <MainToolbar
             filteredDevices={filteredDevices}
             devicesOpen={devicesOpen}
@@ -149,6 +189,16 @@ const MainPage = () => {
             square
             className={classes.contentList}
             style={devicesOpen ? {} : { visibility: 'hidden' }}
+            sx={
+              dark
+                ? {
+                    background: 'transparent',
+                    backdropFilter: 'none',
+                    WebkitBackdropFilter: 'none',
+                    boxShadow: 'none',
+                  }
+                : {}
+            }
           >
             <DeviceList devices={filteredDevices} />
           </Paper>

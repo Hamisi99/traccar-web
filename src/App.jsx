@@ -13,13 +13,16 @@ import TermsDialog from './common/components/TermsDialog';
 import Loader from './common/components/Loader';
 import fetchOrThrow from './common/util/fetchOrThrow';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme) => ({
   page: {
     flexGrow: 1,
     overflow: 'auto',
   },
   menu: {
     zIndex: 4,
+    ...(theme.palette.mode === 'dark' && {
+      padding: theme.spacing(0, 1.5, 1.5, 1.5),
+    }),
     '@media print': {
       display: 'none',
     },

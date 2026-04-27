@@ -10,6 +10,7 @@ import {
   Typography,
   Badge,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 import DescriptionIcon from '@mui/icons-material/Description';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -27,6 +28,8 @@ const BottomMenu = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const t = useTranslation();
+  const theme = useTheme();
+  const dark = theme.palette.mode === 'dark';
 
   const readonly = useRestriction('readonly');
   const disableReports = useRestriction('disableReports');
@@ -126,7 +129,24 @@ const BottomMenu = () => {
   };
 
   return (
-    <Paper square elevation={3}>
+    <Paper
+      square={!dark}
+      elevation={3}
+      sx={
+        dark
+          ? {
+              borderRadius: '16px',
+              overflow: 'hidden',
+              background: 'rgba(8, 19, 38, 0.92)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(59, 130, 246, 0.15)',
+              boxShadow:
+                '0 0 24px rgba(37, 99, 235, 0.1), 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(147, 197, 253, 0.07)',
+            }
+          : {}
+      }
+    >
       <BottomNavigation value={currentSelection()} onChange={handleSelection} showLabels>
         <BottomNavigationAction
           label={t('mapTitle')}

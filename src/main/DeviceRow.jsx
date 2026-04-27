@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from 'tss-react/mui';
 import {
+  Badge,
+  Box,
   IconButton,
   Tooltip,
   Avatar,
@@ -9,6 +11,7 @@ import {
   ListItemButton,
   Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 import BatteryChargingFullIcon from '@mui/icons-material/BatteryChargingFull';
 import Battery60Icon from '@mui/icons-material/Battery60';
@@ -65,10 +68,18 @@ const useStyles = makeStyles()((theme) => ({
   },
 }));
 
+const statusDotColor = (status) => {
+  if (status === 'online') return '#22c55e';
+  if (status === 'offline') return '#475569';
+  return '#f59e0b';
+};
+
 const DeviceRow = ({ devices, index, style }) => {
   const { classes } = useStyles();
   const dispatch = useDispatch();
   const t = useTranslation();
+  const theme = useTheme();
+  const dark = theme.palette.mode === 'dark';
 
   const admin = useAdministrator();
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
@@ -127,9 +138,44 @@ const DeviceRow = ({ devices, index, style }) => {
         className={selectedDeviceId === item.id ? classes.selected : null}
       >
         <ListItemAvatar>
-          <Avatar>
-            <img className={classes.icon} src={mapIcons[mapIconKey(item.category)]} alt="" />
-          </Avatar>
+          {dark ? (
+            <Badge
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              badgeContent={
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'block',
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    border: '1.5px solid #081326',
+                    backgroundColor: statusDotColor(item.status),
+                    ...(item.status === 'online' && {
+                      boxShadow: `0 0 6px rgba(34, 197, 94, 0.7)`,
+                      '@keyframes statusPulse': {
+                        '0%, 100%': { boxShadow: '0 0 3px rgba(34, 197, 94, 0.5)' },
+                        '50%': {
+                          boxShadow:
+                            '0 0 10px rgba(34, 197, 94, 0.9), 0 0 18px rgba(34, 197, 94, 0.4)',
+                        },
+                      },
+                      animation: 'statusPulse 2.5s ease-in-out infinite',
+                    }),
+                  }}
+                />
+              }
+            >
+              <Avatar>
+                <img className={classes.icon} src={mapIcons[mapIconKey(item.category)]} alt="" />
+              </Avatar>
+            </Badge>
+          ) : (
+            <Avatar>
+              <img className={classes.icon} src={mapIcons[mapIconKey(item.category)]} alt="" />
+            </Avatar>
+          )}
         </ListItemAvatar>
         <ListItemText
           primary={primaryValue}
