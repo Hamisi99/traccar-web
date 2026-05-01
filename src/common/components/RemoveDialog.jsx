@@ -7,11 +7,7 @@ import { snackBarDurationLongMs } from '../util/duration';
 import fetchOrThrow from '../util/fetchOrThrow';
 
 const useStyles = makeStyles()((theme) => ({
-  root: {
-    [theme.breakpoints.down('md')]: {
-      bottom: `calc(${theme.dimensions.bottomBarHeight}px + ${theme.spacing(1)})`,
-    },
-  },
+  root: {},
   button: {
     height: 'auto',
     marginTop: 0,

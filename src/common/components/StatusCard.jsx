@@ -99,7 +99,7 @@ const useStyles = makeStyles()((theme, { desktopPadding }) => ({
     },
     [theme.breakpoints.down('md')]: {
       left: '50%',
-      bottom: `calc(${theme.spacing(3)} + ${theme.dimensions.bottomBarHeight}px)`,
+      bottom: theme.spacing(3),
     },
     transform: 'translateX(-50%)',
   },
