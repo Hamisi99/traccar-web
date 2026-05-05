@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import { useTheme } from '@mui/material/styles';
-import { Map, LayoutList, PlusCircle, SlidersHorizontal } from 'lucide-react';
+import { PlusCircle, SlidersHorizontal } from 'lucide-react';
 import { useTranslation } from '../common/components/LocalizationProvider';
 import { useDeviceReadonly } from '../common/util/permissions';
 import DeviceRow from './DeviceRow';
@@ -32,7 +32,9 @@ const ICON_STROKE = 1.75;
 const useStyles = makeStyles()((theme) => ({
   toolbar: {
     display: 'flex',
-    gap: theme.spacing(1),
+    gap: theme.spacing(0.75),
+    minHeight: '48px !important',
+    padding: theme.spacing(0, 1),
   },
   filterPanel: {
     display: 'flex',
@@ -40,6 +42,9 @@ const useStyles = makeStyles()((theme) => ({
     padding: theme.spacing(2),
     gap: theme.spacing(2),
     width: theme.dimensions.drawerWidthTablet,
+    [theme.breakpoints.down('sm')]: {
+      width: '80vw',
+    },
   },
 }));
 
@@ -76,16 +81,9 @@ const MainToolbar = ({
 
   return (
     <Toolbar ref={toolbarRef} className={classes.toolbar}>
-      <IconButton edge="start" onClick={() => setDevicesOpen(!devicesOpen)}>
-        {devicesOpen ? (
-          <Map size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-        ) : (
-          <LayoutList size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-        )}
-      </IconButton>
       <OutlinedInput
         ref={inputRef}
-        placeholder={t('sharedSearchDevices')}
+        placeholder="search"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         onFocus={() => setDevicesAnchorEl(toolbarRef.current)}

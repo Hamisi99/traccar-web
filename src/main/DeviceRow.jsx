@@ -42,8 +42,8 @@ dayjs.extend(relativeTime);
 
 const useStyles = makeStyles()((theme) => ({
   icon: {
-    width: '25px',
-    height: '25px',
+    width: '20px',
+    height: '20px',
     filter: 'brightness(0) invert(1)',
   },
   batteryText: {
@@ -64,7 +64,43 @@ const useStyles = makeStyles()((theme) => ({
     color: theme.palette.neutral.main,
   },
   selected: {
-    backgroundColor: theme.palette.action.selected,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(59, 130, 246, 0.14)'
+        : theme.palette.action.selected,
+    borderLeft: `2px solid ${theme.palette.primary.main}`,
+  },
+  row: {
+    paddingTop: theme.spacing(0.5),
+    paddingBottom: theme.spacing(0.5),
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(0.5),
+    borderBottom:
+      theme.palette.mode === 'dark'
+        ? '1px solid rgba(255, 255, 255, 0.04)'
+        : `1px solid ${theme.palette.divider}`,
+    '&:last-child': {
+      borderBottom: 'none',
+    },
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    minWidth: 32,
+    background:
+      theme.palette.mode === 'dark' ? 'rgba(59, 130, 246, 0.15)' : theme.palette.grey[200],
+  },
+  listItemAvatar: {
+    minWidth: 44,
+  },
+  primaryText: {
+    fontSize: '0.8125rem',
+    fontWeight: 500,
+    lineHeight: 1.3,
+  },
+  secondaryText: {
+    fontSize: '0.6875rem',
+    lineHeight: 1.3,
   },
 }));
 
@@ -135,47 +171,32 @@ const DeviceRow = ({ devices, index, style }) => {
         onClick={() => dispatch(devicesActions.selectId(item.id))}
         disabled={!admin && item.disabled}
         selected={selectedDeviceId === item.id}
-        className={selectedDeviceId === item.id ? classes.selected : null}
+        className={`${classes.row}${selectedDeviceId === item.id ? ` ${classes.selected}` : ''}`}
+        disableGutters
       >
-        <ListItemAvatar>
-          {dark ? (
-            <Badge
-              overlap="circular"
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              badgeContent={
-                <Box
-                  component="span"
-                  sx={{
-                    display: 'block',
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    border: '1.5px solid #081326',
-                    backgroundColor: statusDotColor(item.status),
-                    ...(item.status === 'online' && {
-                      boxShadow: `0 0 6px rgba(34, 197, 94, 0.7)`,
-                      '@keyframes statusPulse': {
-                        '0%, 100%': { boxShadow: '0 0 3px rgba(34, 197, 94, 0.5)' },
-                        '50%': {
-                          boxShadow:
-                            '0 0 10px rgba(34, 197, 94, 0.9), 0 0 18px rgba(34, 197, 94, 0.4)',
-                        },
-                      },
-                      animation: 'statusPulse 2.5s ease-in-out infinite',
-                    }),
-                  }}
-                />
-              }
-            >
-              <Avatar>
-                <img className={classes.icon} src={mapIcons[mapIconKey(item.category)]} alt="" />
-              </Avatar>
-            </Badge>
-          ) : (
-            <Avatar>
+        <ListItemAvatar className={classes.listItemAvatar}>
+          <Badge
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={
+              <Box
+                component="span"
+                sx={{
+                  display: 'block',
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  border: '1.5px solid',
+                  borderColor: dark ? '#0a1628' : '#fff',
+                  backgroundColor: statusDotColor(item.status),
+                }}
+              />
+            }
+          >
+            <Avatar className={classes.avatar}>
               <img className={classes.icon} src={mapIcons[mapIconKey(item.category)]} alt="" />
             </Avatar>
-          )}
+          </Badge>
         </ListItemAvatar>
         <ListItemText
           primary={primaryValue}
@@ -185,8 +206,8 @@ const DeviceRow = ({ devices, index, style }) => {
             secondary: Typography,
           }}
           slotProps={{
-            primary: { noWrap: true },
-            secondary: { noWrap: true },
+            primary: { noWrap: true, className: classes.primaryText },
+            secondary: { noWrap: true, className: classes.secondaryText },
           }}
         />
         {position && (

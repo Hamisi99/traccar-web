@@ -12,15 +12,23 @@ import TermsDialog from './common/components/TermsDialog';
 import Loader from './common/components/Loader';
 import fetchOrThrow from './common/util/fetchOrThrow';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme) => ({
   page: {
-    flexGrow: 1,
-    overflow: 'auto',
+    /* Push content below the fixed navbar */
+    marginTop: `${theme.dimensions.topNavBarHeight}px`,
+    /* Fill exactly the remaining viewport height */
+    height: `calc(100vh - ${theme.dimensions.topNavBarHeight}px)`,
+    overflow: 'hidden',
+    '@media print': {
+      marginTop: 0,
+      height: 'auto',
+    },
   },
 }));
 
 const App = () => {
   const { classes } = useStyles();
+  document.title = 'Simpo Tracker';
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
