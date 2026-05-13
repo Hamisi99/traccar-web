@@ -9,6 +9,10 @@ const useStyles = makeStyles()((theme) => ({
     position: 'fixed',
     bottom: theme.spacing(2),
     right: theme.spacing(2),
+    zIndex: theme.zIndex.appBar + 1,
+    [theme.breakpoints.down('md')]: {
+      bottom: `calc(${theme.dimensions.bottomBarHeight}px + ${theme.spacing(2)})`,
+    },
   },
 }));
 

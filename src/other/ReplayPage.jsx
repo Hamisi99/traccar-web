@@ -36,8 +36,12 @@ const useStyles = makeStyles()((theme) => ({
     zIndex: 3,
     left: 0,
     top: 0,
-    margin: theme.spacing(1.5),
-    width: theme.dimensions.drawerWidthDesktop,
+    [theme.breakpoints.up('md')]: {
+      top: `${theme.dimensions.topNavBarHeight}px`,
+      margin: theme.spacing(1.5),
+      width: theme.dimensions.drawerWidthDesktop,
+      maxHeight: `calc(100vh - ${theme.dimensions.topNavBarHeight}px - ${theme.spacing(3)})`,
+    },
     [theme.breakpoints.down('md')]: {
       width: '100%',
       margin: 0,

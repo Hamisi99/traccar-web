@@ -13,10 +13,9 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { Map, BarChart3, Settings2, CircleUser, LogOut } from 'lucide-react';
 
-import { sessionActions } from '../../store';
 import { useTranslation } from './LocalizationProvider';
 import { useRestriction } from '../util/permissions';
-import { nativePostMessage } from './NativeInterface';
+import logoutUser from '../util/logoutUser';
 
 const NAV_ICON_SIZE = 22;
 const NAV_STROKE = 1.75;
@@ -61,34 +60,7 @@ const BottomMenu = () => {
 
   const handleLogout = async () => {
     setAnchorEl(null);
-
-    const notificationToken = window.localStorage.getItem('notificationToken');
-    if (notificationToken && !user.readonly) {
-      window.localStorage.removeItem('notificationToken');
-      const tokens = user.attributes.notificationTokens?.split(',') || [];
-      if (tokens.includes(notificationToken)) {
-        const updatedUser = {
-          ...user,
-          attributes: {
-            ...user.attributes,
-            notificationTokens:
-              tokens.length > 1
-                ? tokens.filter((it) => it !== notificationToken).join(',')
-                : undefined,
-          },
-        };
-        await fetch(`/api/users/${user.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedUser),
-        });
-      }
-    }
-
-    await fetch('/api/session', { method: 'DELETE' });
-    nativePostMessage('logout');
-    navigate('/login');
-    dispatch(sessionActions.updateUser(null));
+    await logoutUser({ user, dispatch, navigate });
   };
 
   const handleSelection = (event, value) => {

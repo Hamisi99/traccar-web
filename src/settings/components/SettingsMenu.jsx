@@ -9,25 +9,35 @@ import HelpIcon from '@mui/icons-material/Help';
 import PaymentIcon from '@mui/icons-material/Payment';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import CalculateIcon from '@mui/icons-material/Calculate';
-import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '../../common/components/LocalizationProvider';
 import { useAdministrator, useManager, useRestriction } from '../../common/util/permissions';
 import useFeatures from '../../common/util/useFeatures';
 import MenuItem from '../../common/components/MenuItem';
+import logoutUser from '../../common/util/logoutUser';
 
 const SettingsMenu = () => {
   const t = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const readonly = useRestriction('readonly');
   const admin = useAdministrator();
   const manager = useManager();
+  const user = useSelector((state) => state.session.user);
   const userId = useSelector((state) => state.session.user.id);
   const supportLink = useSelector((state) => state.session.server.attributes.support);
   const billingLink = useSelector((state) => state.session.user.attributes.billingLink);
 
   const features = useFeatures();
+
+  const handleLogout = async () => {
+    await logoutUser({ user, dispatch, navigate });
+  };
 
   return (
     <>
@@ -92,6 +102,18 @@ const SettingsMenu = () => {
         {supportLink && (
           <MenuItem title={t('settingsSupport')} link={supportLink} icon={<HelpIcon />} />
         )}
+      </List>
+      <Divider />
+      <List>
+        <ListItemButton onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon color="error" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('loginLogout')}
+            primaryTypographyProps={{ color: 'error' }}
+          />
+        </ListItemButton>
       </List>
       {manager && (
         <>

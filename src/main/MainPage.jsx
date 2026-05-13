@@ -39,7 +39,7 @@ const useStyles = makeStyles()((theme) => ({
       overflow: 'hidden',
     },
     [theme.breakpoints.down('md')]: {
-      height: '100%',
+      height: `calc(100% - ${theme.dimensions.bottomBarHeight}px)`,
       width: '100%',
     },
   },
@@ -68,6 +68,7 @@ const useStyles = makeStyles()((theme) => ({
     zIndex: 4,
     display: 'flex',
     minHeight: 0,
+    background: theme.palette.mode === 'dark' ? '#0a1628' : theme.palette.background.paper,
   },
 }));
 
@@ -158,7 +159,6 @@ const MainPage = () => {
             elevation={0}
             className={classes.contentList}
             style={devicesOpen ? {} : { visibility: 'hidden' }}
-            sx={{ background: 'transparent' }}
           >
             <DeviceList devices={filteredDevices} />
           </Paper>
@@ -170,7 +170,7 @@ const MainPage = () => {
           onClick={() => setDevicesOpen((v) => !v)}
           sx={{
             position: 'fixed',
-            bottom: 20,
+            bottom: theme.dimensions.bottomBarHeight + 16,
             right: 16,
             zIndex: 10,
             bgcolor: 'primary.main',

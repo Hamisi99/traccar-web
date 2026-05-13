@@ -14,11 +14,16 @@ import fetchOrThrow from './common/util/fetchOrThrow';
 
 const useStyles = makeStyles()((theme) => ({
   page: {
-    /* Push content below the fixed navbar */
+    /* Push content below the fixed navbar on desktop */
     marginTop: `${theme.dimensions.topNavBarHeight}px`,
     /* Fill exactly the remaining viewport height */
     height: `calc(100vh - ${theme.dimensions.topNavBarHeight}px)`,
     overflow: 'hidden',
+    /* On mobile: no AppBar, so no top offset needed */
+    [theme.breakpoints.down('md')]: {
+      marginTop: 0,
+      height: '100vh',
+    },
     '@media print': {
       marginTop: 0,
       height: 'auto',

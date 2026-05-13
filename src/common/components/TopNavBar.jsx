@@ -10,28 +10,22 @@ import {
   MenuItem,
   Typography,
   Badge,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-  IconButton,
+  BottomNavigation,
+  BottomNavigationAction,
 } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-import { Map, BarChart3, Settings2, CircleUser, LogOut, MapPin, Bell, Wrench, Users, Terminal, Menu as MenuIcon, X } from 'lucide-react';
+import { Map, BarChart3, Settings2, CircleUser, LogOut, MapPin, Bell, Wrench, Users, Terminal } from 'lucide-react';
 
-import { sessionActions } from '../../store';
 import { useTranslation } from './LocalizationProvider';
-import { useAdministrator, useManager, useRestriction } from '../util/permissions';
-import { nativePostMessage } from './NativeInterface';
+import { useManager, useRestriction } from '../util/permissions';
 import useFeatures from '../util/useFeatures';
+import logoutUser from '../util/logoutUser';
 
 const NAV_ICON_SIZE = 15;
 const NAV_STROKE = 1.75;
-const DRAWER_WIDTH = 240;
+const BOTTOM_NAV_ICON_SIZE = 22;
 
 const useStyles = makeStyles()((theme) => ({
   appBar: {
@@ -128,42 +122,35 @@ const useStyles = makeStyles()((theme) => ({
       border: '1px solid rgba(255, 255, 255, 0.35)',
     },
   },
-  hamburger: {
-    color: '#fff',
-    marginRight: theme.spacing(0.5),
-    padding: theme.spacing(0.75),
-  },
-  navDrawerPaper: {
-    width: DRAWER_WIDTH,
-    top: `${theme.dimensions.topNavBarHeight}px`,
-    height: `calc(100% - ${theme.dimensions.topNavBarHeight}px)`,
-    background: theme.palette.mode === 'dark' ? '#0b1628' : '#1565c0',
-    borderRight: 'none',
-  },
-  drawerItem: {
-    color: 'rgba(255,255,255,0.78)',
-    borderLeft: '3px solid transparent',
-    '&:hover': {
-      background: 'rgba(255,255,255,0.08)',
-      color: '#fff',
+  bottomNav: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: theme.zIndex.appBar,
+    background: theme.palette.mode === 'dark' ? '#0b1628' : '#1a56db',
+    borderTop: theme.palette.mode === 'dark'
+      ? '1px solid rgba(59, 130, 246, 0.2)'
+      : '1px solid rgba(255, 255, 255, 0.15)',
+    height: `${theme.dimensions.bottomBarHeight}px`,
+    '@media print': {
+      display: 'none',
     },
-  },
-  drawerItemActive: {
-    color: '#fff',
-    background: 'rgba(96, 165, 250, 0.15)',
-    borderLeft: '3px solid #60a5fa',
-    '&:hover': {
-      background: 'rgba(96, 165, 250, 0.2)',
+    '& .MuiBottomNavigationAction-root': {
+      color: 'rgba(255, 255, 255, 0.55)',
+      minWidth: 0,
+      padding: '6px 0 8px',
     },
-  },
-  drawerIcon: {
-    color: 'inherit',
-    minWidth: 36,
-  },
-  drawerItemText: {
-    '& .MuiListItemText-primary': {
-      fontSize: '0.875rem',
+    '& .MuiBottomNavigationAction-root.Mui-selected': {
+      color: '#60a5fa',
+    },
+    '& .MuiBottomNavigationAction-label': {
+      fontSize: '0.625rem',
       fontWeight: 500,
+      marginTop: '2px',
+    },
+    '& .MuiBottomNavigationAction-label.Mui-selected': {
+      fontSize: '0.625rem',
     },
   },
 }));
@@ -182,7 +169,6 @@ const TopNavBar = () => {
   const readonly = useRestriction('readonly');
   const disableReports = useRestriction('disableReports');
   const manager = useManager();
-  const admin = useAdministrator();
 
   const devices = useSelector((state) => state.devices.items);
   const user = useSelector((state) => state.session.user);
@@ -190,7 +176,6 @@ const TopNavBar = () => {
   const selectedDeviceId = useSelector((state) => state.devices.selectedId);
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const currentSelection = () => {
     const p = location.pathname;
@@ -216,34 +201,7 @@ const TopNavBar = () => {
 
   const handleLogout = async () => {
     setAnchorEl(null);
-
-    const notificationToken = window.localStorage.getItem('notificationToken');
-    if (notificationToken && !user.readonly) {
-      window.localStorage.removeItem('notificationToken');
-      const tokens = user.attributes.notificationTokens?.split(',') || [];
-      if (tokens.includes(notificationToken)) {
-        const updatedUser = {
-          ...user,
-          attributes: {
-            ...user.attributes,
-            notificationTokens:
-              tokens.length > 1
-                ? tokens.filter((it) => it !== notificationToken).join(',')
-                : undefined,
-          },
-        };
-        await fetch(`/api/users/${user.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedUser),
-        });
-      }
-    }
-
-    await fetch('/api/session', { method: 'DELETE' });
-    nativePostMessage('logout');
-    navigate('/login');
-    dispatch(sessionActions.updateUser(null));
+    await logoutUser({ user, dispatch, navigate });
   };
 
   const handleReports = () => {
@@ -322,6 +280,49 @@ const TopNavBar = () => {
     },
   ];
 
+  // Bottom nav shows only the 5 core sections
+  const bottomNavItems = [
+    {
+      value: 'map',
+      icon: (
+        <Badge color="error" variant="dot" overlap="circular" invisible={socket !== false}>
+          <Map size={BOTTOM_NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />
+        </Badge>
+      ),
+      label: 'Monitor',
+      onClick: () => navigate('/'),
+      show: true,
+    },
+    {
+      value: 'geofences',
+      icon: <MapPin size={BOTTOM_NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />,
+      label: t('sharedGeofences'),
+      onClick: () => navigate('/geofences'),
+      show: !readonly,
+    },
+    {
+      value: 'notifications',
+      icon: <Bell size={BOTTOM_NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />,
+      label: t('sharedNotifications'),
+      onClick: () => navigate('/settings/notifications'),
+      show: !readonly,
+    },
+    {
+      value: 'reports',
+      icon: <BarChart3 size={BOTTOM_NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />,
+      label: t('reportTitle'),
+      onClick: handleReports,
+      show: !disableReports,
+    },
+    {
+      value: 'settings',
+      icon: <Settings2 size={BOTTOM_NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />,
+      label: t('settingsTitle'),
+      onClick: () => navigate('/settings/preferences?menu=true'),
+      show: true,
+    },
+  ];
+
   const NavBtn = ({ value, icon, label, onClick }) => (
     <Button
       className={cx(classes.navButton, active === value && classes.navButtonActive)}
@@ -334,88 +335,77 @@ const TopNavBar = () => {
 
   return (
     <>
-      <AppBar position="fixed" className={classes.appBar} elevation={0}>
-        <Toolbar className={classes.toolbar}>
-          {mobile && (
-            <IconButton className={classes.hamburger} onClick={() => setDrawerOpen((v) => !v)}>
-              {drawerOpen ? <X size={20} strokeWidth={NAV_STROKE} /> : <MenuIcon size={20} strokeWidth={NAV_STROKE} />}
-            </IconButton>
-          )}
+      {!mobile && (
+        <AppBar position="fixed" className={classes.appBar} elevation={0}>
+          <Toolbar className={classes.toolbar}>
+            {/* Brand wordmark */}
+            <Box className={classes.brand}>
+              <span className={classes.brandSimpo}>Simpo</span>
+              <span className={classes.brandTracker}>Tracker</span>
+            </Box>
 
-          {/* Brand wordmark */}
-          <Box className={classes.brand}>
-            <span className={classes.brandSimpo}>Simpo</span>
-            <span className={classes.brandTracker}>Tracker</span>
-          </Box>
+            {/* Desktop nav buttons */}
+            {navItems.filter((i) => i.show).map((item) => (
+              <NavBtn
+                key={item.value}
+                value={item.value}
+                icon={item.icon}
+                label={item.label}
+                onClick={item.onClick}
+              />
+            ))}
 
-          {/* Desktop nav buttons */}
-          {!mobile && navItems.filter((i) => i.show).map((item) => (
-            <NavBtn
+            <Box sx={{ flexGrow: 1, minWidth: 8 }} />
+
+            {/* Account / Logout */}
+            {readonly ? (
+              <Button
+                className={classes.accountButton}
+                onClick={handleLogout}
+                startIcon={<LogOut size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
+              >
+                {t('loginLogout')}
+              </Button>
+            ) : (
+              <Button
+                className={cx(classes.accountButton, active === 'account' && classes.navButtonActive)}
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                startIcon={<CircleUser size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
+              >
+                {user?.name || t('settingsUser')}
+              </Button>
+            )}
+
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+              <MenuItem onClick={handleAccount}>
+                <Typography color="textPrimary">{t('settingsUser')}</Typography>
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <Typography color="error">{t('loginLogout')}</Typography>
+              </MenuItem>
+            </Menu>
+          </Toolbar>
+        </AppBar>
+      )}
+
+      {/* Mobile bottom navigation bar */}
+      {mobile && (
+        <BottomNavigation
+          value={active}
+          className={classes.bottomNav}
+          showLabels
+        >
+          {bottomNavItems.filter((i) => i.show).map((item) => (
+            <BottomNavigationAction
               key={item.value}
               value={item.value}
-              icon={item.icon}
               label={item.label}
+              icon={item.icon}
               onClick={item.onClick}
             />
           ))}
-
-          <Box sx={{ flexGrow: 1, minWidth: 8 }} />
-
-          {/* Account / Logout — always visible */}
-          {readonly ? (
-            <Button
-              className={classes.accountButton}
-              onClick={handleLogout}
-              startIcon={<LogOut size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
-            >
-              {!mobile && t('loginLogout')}
-            </Button>
-          ) : (
-            <Button
-              className={cx(classes.accountButton, active === 'account' && classes.navButtonActive)}
-              onClick={(e) => setAnchorEl(e.currentTarget)}
-              startIcon={<CircleUser size={NAV_ICON_SIZE} strokeWidth={NAV_STROKE} />}
-            >
-              {!mobile && (user?.name || t('settingsUser'))}
-            </Button>
-          )}
-
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-            <MenuItem onClick={handleAccount}>
-              <Typography color="textPrimary">{t('settingsUser')}</Typography>
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              <Typography color="error">{t('loginLogout')}</Typography>
-            </MenuItem>
-          </Menu>
-        </Toolbar>
-      </AppBar>
-
-      {/* Mobile slide-out navigation drawer */}
-      <Drawer
-        variant="temporary"
-        anchor="left"
-        open={mobile && drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        ModalProps={{ keepMounted: true }}
-        PaperProps={{ className: classes.navDrawerPaper }}
-        sx={{ zIndex: theme.zIndex.drawer + 1 }}
-      >
-        <List disablePadding>
-          {navItems.filter((i) => i.show).map((item, idx) => (
-            <div key={item.value}>
-              {idx > 0 && item.value === 'settings' && <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)', my: 0.5 }} />}
-              <ListItemButton
-                className={cx(classes.drawerItem, active === item.value && classes.drawerItemActive)}
-                onClick={() => { item.onClick(); setDrawerOpen(false); }}
-              >
-                <ListItemIcon className={classes.drawerIcon}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} className={classes.drawerItemText} />
-              </ListItemButton>
-            </div>
-          ))}
-        </List>
-      </Drawer>
+        </BottomNavigation>
+      )}
     </>
   );
 };
