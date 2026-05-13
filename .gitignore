@@ -19,3 +19,6 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# local Traccar server archives
+traccar-linux-64-*.zip
