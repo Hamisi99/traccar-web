@@ -1,9 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { createDefaultServer, mergeServer } from '../common/util/defaultServer';
 
 const { reducer, actions } = createSlice({
   name: 'session',
   initialState: {
-    server: null,
+    server: createDefaultServer(),
+    serverLoaded: false,
     user: null,
     socket: null,
     includeLogs: false,
@@ -13,7 +15,8 @@ const { reducer, actions } = createSlice({
   },
   reducers: {
     updateServer(state, action) {
-      state.server = action.payload;
+      state.server = mergeServer(action.payload);
+      state.serverLoaded = true;
     },
     updateUser(state, action) {
       state.user = action.payload;

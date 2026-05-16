@@ -38,6 +38,7 @@ const App = () => {
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
 
+  const serverLoaded = useSelector((state) => state.session.serverLoaded);
   const newServer = useSelector((state) => state.session.server.newServer);
   const termsUrl = useSelector((state) => state.session.server.attributes.termsUrl);
   const user = useSelector((state) => state.session.user);
@@ -52,19 +53,21 @@ const App = () => {
   });
 
   useEffectAsync(async () => {
-    if (!user) {
-      const response = await fetch('/api/session');
-      if (response.ok) {
-        dispatch(sessionActions.updateUser(await response.json()));
-      } else {
-        window.sessionStorage.setItem('postLogin', pathname + search);
-        navigate(newServer ? '/register' : '/login', { replace: true });
-      }
+    if (!serverLoaded || user) {
+      return null;
+    }
+
+    const response = await fetch('/api/session');
+    if (response.ok) {
+      dispatch(sessionActions.updateUser(await response.json()));
+    } else {
+      window.sessionStorage.setItem('postLogin', pathname + search);
+      navigate(newServer ? '/register' : '/login', { replace: true });
     }
     return null;
-  }, []);
+  }, [serverLoaded, user, pathname, search, navigate, newServer]);
 
-  if (user == null) {
+  if (!serverLoaded || user == null) {
     return <Loader />;
   }
   if (termsUrl && !user.attributes.termsAccepted) {
