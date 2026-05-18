@@ -1,10 +1,23 @@
 import { useEffect } from 'react';
 
+export const hideGlobalLoader = () => {
+  const loader = document.querySelector('.loader');
+  if (loader) {
+    loader.style.display = 'none';
+  }
+};
+
+export const showGlobalLoader = () => {
+  const loader = document.querySelector('.loader');
+  if (loader) {
+    loader.style.display = 'block';
+  }
+};
+
 const Loader = () => {
   useEffect(() => {
-    const loader = document.querySelector('.loader');
-    loader.style.display = '';
-    return () => (loader.style.display = 'none');
+    showGlobalLoader();
+    return hideGlobalLoader;
   }, []);
   return null;
 };

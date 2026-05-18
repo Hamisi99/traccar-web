@@ -1,4 +1,5 @@
 import { Route, Routes, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import MainPage from './main/MainPage';
 import CombinedReportPage from './reports/CombinedReportPage';
@@ -55,7 +56,7 @@ import SharePage from './settings/SharePage';
 import AnnouncementPage from './settings/AnnouncementPage';
 import EmulatorPage from './other/EmulatorPage';
 import StreamPage from './other/StreamPage';
-import Loader from './common/components/Loader';
+import Loader, { hideGlobalLoader } from './common/components/Loader';
 import { generateLoginToken } from './common/components/NativeInterface';
 import { useLocalization } from './common/components/LocalizationProvider';
 import fetchOrThrow from './common/util/fetchOrThrow';
@@ -107,6 +108,12 @@ const Navigation = () => {
 
     setSearchParams(newParams, { replace: true });
   }, [hasQueryParams, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (!hasQueryParams) {
+      hideGlobalLoader();
+    }
+  }, [hasQueryParams]);
 
   if (hasQueryParams) {
     return <Loader />;
